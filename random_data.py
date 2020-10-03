@@ -77,6 +77,8 @@ def visualize_all(global_map, local_map, base_pose):
     # global map
     plt.subplot(121)
     plt.gcf().gca().title.set_text("Global Map")
+    plt.gcf().set_figheight(10)
+    plt.gcf().set_figwidth(20)
     # plt.gcf().gca().set_xlabel("X(m)")
     # plt.gcf().gca().set_ylabel("Y(m)")
     for landmark in global_map:
