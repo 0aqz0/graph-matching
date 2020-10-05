@@ -15,7 +15,7 @@ max_y = 100
 noise_mu = 0
 noise_var = 2.0
 visual_range = 20.0
-visual_theta = 90.0 # degree
+visual_theta = 60.0 # degree
 
 def create_global_map():
     global_map = []
@@ -55,8 +55,8 @@ def create_local_map(map):
     base_pose = [random_x, random_y, random_ori]
     translation = np.array([-random_x, -random_y]).T
     translation = np.expand_dims(translation, axis=1)
-    rotation = np.array([[np.cos(random_ori), np.sin(random_ori)],
-                        [-np.sin(random_ori), np.cos(random_ori)]])
+    rotation = np.array([[np.cos(random_ori-math.pi/2), np.sin(random_ori-math.pi/2)],
+                        [-np.sin(random_ori-math.pi/2), np.cos(random_ori-math.pi/2)]])
     local_map = []
     for landmark in map:
         global_pose = np.array([landmark[0], landmark[1]]).T
@@ -66,8 +66,8 @@ def create_local_map(map):
         local_y = local_pose[1]
         local_label = landmark[2]
         local_landmark = [local_x, local_y, local_label]
-        theta = math.fabs(math.atan2(local_landmark[1], local_landmark[0])) / math.pi * 180.0
-        if math.hypot(local_x, local_y) < visual_range and theta <= visual_theta:
+        theta = math.atan2(local_landmark[1], local_landmark[0]) / math.pi * 180.0
+        if math.hypot(local_x, local_y) < visual_range and theta > 90 - visual_theta and theta < 90 + visual_theta :
             local_map.append(local_landmark)
         
     return base_pose, local_map
