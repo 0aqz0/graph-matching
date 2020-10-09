@@ -20,7 +20,7 @@ noise_mu = 0
 noise_var = 2.0
 visual_range = 160.0
 visual_theta = 60.0 # degree
-save_path = "./dataset/" + str(max_x) + "x" + str(max_y) + "_" + str(total_num)
+save_path = "./data/" + str(max_x) + "x" + str(max_y) +"/"+ str(total_num)
 
 if not os.path.exists(save_path):
     os.makedirs(save_path)
@@ -133,23 +133,16 @@ def gen_dataset():
     while(len(lm)==0):
         bp, lm, match = create_local_map(gm)
     gm = add_gaussian_noise(gm)
+    bp = torch.Tensor(bp[0:2])
 
     # base map
     gsize = len(gm)
     keypoints0 = torch.from_numpy(np.array(gm)[:, 0:2])
     scores0 = torch.ones(gsize)
     descriptors0 = torch.Tensor([[i[2]] for i in gm])
-    matches0 =[]
-    index = 0
-    for i in range(gsize):
-        if i in match:
-            matches0.append(index)
-            index = index+1
-        else:
-            matches0.append(-1)
-    matches0 = torch.Tensor(matches0)
-    # matches0 = torch.Tensor([i in match and i or -1 for i in range(gsize)])
-    matching_scores0 = torch.Tensor([i > -1 and 1. or 0. for i in range(gsize)])
+    idx = iter(range(gsize))
+    matches0 = torch.Tensor([next(idx) if i in match else -1 for i in range(gsize)])
+    matching_scores0 = torch.Tensor([1. if matches0[i] > -1 else 0. for i in range(gsize)])
 
     # match map
     lsize = len(lm)
@@ -164,7 +157,7 @@ def gen_dataset():
                  'descriptors0': descriptors0, 'descriptors1': descriptors1,
                  'matches0': matches0, 'matches1': matches1,
                  'matching_scores0': matching_scores0, 'matching_scores1': matching_scores1,
-                 'base_pose': bp[0:2]})
+                 'base_pose': bp})
 
     return data
 
@@ -185,6 +178,6 @@ if __name__ == '__main__':
     # visualize_all(global_map, local_map, base_pose)
 
     # print(gen_dataset())
-    for i in range(10000):
+    for i in range(1):
         # pickle.dump(gen_dataset(), open(os.path.join(save_path, str(i).zfill(4)+".pkl"), "wb"))
         np.save(os.path.join(save_path, str(i).zfill(4)+".npy"), gen_dataset())

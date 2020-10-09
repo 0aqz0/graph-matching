@@ -132,4 +132,4 @@ dmypy.json
 test.*
 
 # dataset
-dataset/*
+data/*
